@@ -8,6 +8,13 @@
       "when": 1755757611445,
       "tag": "0000_chubby_cloak",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1755766424717,
+      "tag": "0001_quick_fabian_cortez",
+      "breakpoints": true
     }
   ]
 }
