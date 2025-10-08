@@ -41,10 +41,14 @@ import React from 'react';
 import { Calendar, Clock, Users, Video, Bot, TrendingUp, Activity, Bell, Plus, ArrowRight, Play, Eye } from 'lucide-react';
 import { Button } from 'src/components/ui/button';
 import { authClient } from 'src/lib/auth-client';
+import { useQueries, useQuery } from '@tanstack/react-query';
+import { useTRPC } from 'src/trpc/client';
+import { da } from 'date-fns/locale';
 
 export const DashboardHome = () => {
   const { data: session } = authClient.useSession();
-
+  const trpc = useTRPC();
+  const { data } = useQuery(trpc.hello.queryOptions({text: 'from dashboard'}));
   if (!session) {
     return <p>Loading...</p>;
   }
@@ -91,7 +95,7 @@ export const DashboardHome = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {session.user.name?.split(' ')[0] || 'User'}!
+            Welcome back {data?.greeting}, {session.user.name?.split(' ')[0] || 'User'}!
           </h1>
           <p className="text-gray-600 mt-1">Here's what's happening with your AI-powered meetings today.</p>
         </div>
