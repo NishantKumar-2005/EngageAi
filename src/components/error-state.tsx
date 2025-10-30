@@ -5,7 +5,7 @@ interface Props {
     description: string;
 }
 
-const AlertState: React.FC<Props> = ({ title, description }) => {
+const ErrorState: React.FC<Props> = ({ title, description }) => {
     return (
         <div className="flex flex-col items-center justify-center p-4">
             <AlertCircleIcon className="w-12 h-12 text-red-500" />
@@ -15,4 +15,4 @@ const AlertState: React.FC<Props> = ({ title, description }) => {
     );
 };
 
-export default AlertState;
+export default ErrorState;
