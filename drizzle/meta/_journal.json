@@ -15,6 +15,13 @@
       "when": 1755766424717,
       "tag": "0001_quick_fabian_cortez",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761803463555,
+      "tag": "0002_dark_inhumans",
+      "breakpoints": true
     }
   ]
 }
