@@ -1,56 +1,36 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { use } from "react";
-import { Button } from "src/components/ui/button";
-import { authClient } from "src/lib/auth-client";
+// "use client";
+// import { useRouter } from "next/navigation";
+// import { use } from "react";
+// import { Button } from "src/components/ui/button";
+// import { authClient } from "src/lib/auth-client";
 
-export const Homeview = ()=> {
-  const router = useRouter();
+// export const Homeview = ()=> {
+//   const router = useRouter();
 
-  const {data:session} = authClient.useSession();
+//   const {data:session} = authClient.useSession();
 
-<<<<<<< HEAD
-  if(!session){
-    return(
-      <p>Loading...</p>
-    )
-  }
+// //   if(!session){
+// //     return(
+// //       <p>Loading...</p>
+// //     )
+// //   }
 
-  return(
-    <div className = "flex flex-col p-4 gap-y-4">
-        <p> Logged in as {session.user.name} </p>
-        <br></br>
-        <Button onClick = {()=> authClient.signOut({
-          fetchOptions : {
-            onSuccess : () => router.push("/auth/sign-in")
-           }
-          })
-          }>
-          Sign Out
-        </Button>
-=======
-//   if(!session){
-//     return(
-//       <p>Loading...</p>
-//     )
-//   }
-
-//   return(
-//     <div className = "flex flex-col p-4 gap-y-4">
-//         <p> Logged in as {session.user.name} </p>
-//         <br></br>
-//         <Button onClick = {()=> authClient.signOut({
-//           fetchOptions : {
-//             onSuccess : () => router.push("/auth/sign-in")
-//            }
-//           })
-//           }>
-//           Sign Out
-//         </Button>
-//     </div>
-//   );
+// //   return(
+// //     <div className = "flex flex-col p-4 gap-y-4">
+// //         <p> Logged in as {session.user.name} </p>
+// //         <br></br>
+// //         <Button onClick = {()=> authClient.signOut({
+// //           fetchOptions : {
+// //             onSuccess : () => router.push("/auth/sign-in")
+// //            }
+// //           })
+// //           }>
+// //           Sign Out
+// //         </Button>
+// //     </div>
+// //   );
    
-// }
+// // }
 
 
 
@@ -305,7 +285,6 @@ export const DashboardHome = () => {
           </div>
         </div>
       </div>
->>>>>>> b69f3f086d39c46fe2ee9ecdf2c6b013136049a5
     </div>
   );
    
