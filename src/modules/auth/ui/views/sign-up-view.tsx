@@ -361,7 +361,7 @@ const FloatingIcon = ({ icon: Icon, delay, duration, x, y, size = "w-8 h-8" }: {
   );
 };
 
-// Circuit pattern component
+
 const CircuitPattern = () => {
   return (
     <div className="absolute inset-0 opacity-10">
@@ -379,7 +379,7 @@ const CircuitPattern = () => {
   );
 };
 
-// Animated gradient orbs
+
 const AnimatedOrbs = () => {
   return (
     <div className="absolute inset-0 overflow-hidden">
@@ -598,14 +598,14 @@ export const SignUpView = () => {
             </form>
           </Form>
 
-          {/* Enhanced animated background */}
+        
           <div className="bg-gradient-to-br from-green-600 via-green-700 to-green-800 relative hidden md:flex flex-col gap-y-4 items-center justify-center overflow-hidden">
             
-            {/* Animated background elements */}
+      
             <AnimatedOrbs />
             <CircuitPattern />
             
-            {/* Floating AI icons - different positions for variety */}
+            
             <FloatingIcon icon={Users} delay={0} duration={6} x="20%" y="15%" size="w-6 h-6" />
             <FloatingIcon icon={Shield} delay={1} duration={8} x="75%" y="20%" size="w-8 h-8" />
             <FloatingIcon icon={Brain} delay={2} duration={5} x="15%" y="75%" size="w-7 h-7" />
@@ -615,7 +615,7 @@ export const SignUpView = () => {
             <FloatingIcon icon={Bot} delay={2.5} duration={4} x="55%" y="30%" size="w-6 h-6" />
             <FloatingIcon icon={Cpu} delay={0.5} duration={7} x="40%" y="45%" size="w-5 h-5" />
 
-            {/* Main logo and text with enhanced styling */}
+          
             <div className="relative z-10 flex flex-col items-center">
               <div className="relative">
                 <div className="absolute inset-0 bg-white/20 rounded-full animate-ping" 
@@ -641,7 +641,7 @@ export const SignUpView = () => {
               </div>
             </div>
 
-            {/* Animated sign-up benefits */}
+          
             <div className="absolute bottom-10 left-10 right-10">
               <div className="flex justify-between items-center text-green-300/60 text-xs">
                 <div className="flex items-center space-x-1">
