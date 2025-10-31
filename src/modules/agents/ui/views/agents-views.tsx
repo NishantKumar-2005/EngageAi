@@ -5,6 +5,7 @@ import { useTRPC } from "src/trpc/client";
 import { LoadingState } from "src/components/loading-state";
 import ErrorState from "src/components/error-state";
 import { useEffect, useState } from "react";
+import { DataTable } from "../components/data-table";
 // import { ResponsiveDialog } from "src/components/responsive-dialogue";
 // import { Button } from "src/components/ui/button";
 

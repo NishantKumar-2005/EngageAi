@@ -5,7 +5,7 @@ import { auth } from "src/lib/auth";
 import { HomeView } from "src/modules/home/ui/views/home-view";
 
 const Page = async () => {
-const session = await auth. api. getSession({
+const session = await auth.api.getSession({
 headers: await headers(),
 });
 
