@@ -5,6 +5,9 @@ import { useTRPC } from "src/trpc/client";
 import { LoadingState } from "src/components/loading-state";
 import ErrorState from "src/components/error-state";
 import { useEffect, useState } from "react";
+import { columns,  } from "../components/columns";
+import { DataTable } from "../components/data-table";
+import { EmptyState } from "src/components/empty-state";
 // import { ResponsiveDialog } from "src/components/responsive-dialogue";
 // import { Button } from "src/components/ui/button";
 
@@ -30,7 +33,7 @@ export const AgentsView = () => {
   }
 
   return (
-    <div>
+    <div className="flex-1 pb-4 px-4 md:px-8 flex flex-col gap-y-4">
       {/* <ResponsiveDialog
        title = "Responsive test"
        description = "Responsive desc"
@@ -41,7 +44,14 @@ export const AgentsView = () => {
           Some action
         </Button>
       </ResponsiveDialog> */}
-      {JSON.stringify(data, null, 2)}
+      <DataTable data={data} columns={columns} />
+      {data.length === 0 && (
+        <EmptyState
+          title="Create your first agent"
+          description="Create an agent to join your meetings.
+          Each agent will follow your instructions and can interact with your meeting participants."
+        />
+      )}
     </div>
   );
 };

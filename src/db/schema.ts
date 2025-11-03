@@ -1,4 +1,3 @@
-import { create } from "domain";
 import { pgTable, text, timestamp, boolean} from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
