@@ -3,36 +3,47 @@ import { db } from "src/db";
 import { meetings } from "src/db/schema";
 import { createTRPCRouter, protectedProcedure } from "src/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, getTableColumns, ilike } from "drizzle-orm";
+import { and, count, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
-import { meetingsInsertSchema } from "../schemas";
+import { meetingsInsertSchema, meetingsUpdateSchema } from "../schemas";
 
 export const meetingsRouter = createTRPCRouter({
 
+  update: protectedProcedure.input(meetingsUpdateSchema).mutation(async ({ input, ctx }) => {
+          const [updatedMeeting] = await db
+            .update(meetings)
+            .set(input)
+            .where(and(
+              eq(meetings.id, input.id), eq(meetings.userId, ctx.auth.user.id)
+          ))
+            .returning();
+          if (!updatedMeeting) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "Meeting not found" });
+          }
+          return updatedMeeting;
+        }),
   create:protectedProcedure
-        .input(meetingsInsertSchema)
-        .mutation(async ({ input, ctx }) => {
-        const [createdMeeting] = await db
-        .insert(meetings)
-        .values({
-        ... input,
-        userId: ctx.auth.user.id,
-        })
-        .returning();
-        createdMeeting;
-    }),
+          .input(meetingsInsertSchema)
+          .mutation(async ({ input, ctx }) => {
+          const [createdMeeting] = await db
+          .insert(meetings)
+          .values({
+          ... input,
+          userId: ctx.auth.user.id,
+          })
 
-  getOne: protectedProcedure
-  .input(z.object({ id: z.string() }))
-  .query(async ({ input, ctx }) => {
+          //TODO CREATE STREAM CALL
+          .returning();
+          createdMeeting;
+      }),
+  getOne: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
     const [existingMeeting] = await db
       .select({
+        meetingCount: sql<number>`5`,
         ...getTableColumns(meetings),
       })
       .from(meetings)
-      .where(and(
-        eq(meetings.id, input.id),
-        eq(meetings.userId, ctx.auth.user.id)));
+      .where(and(eq(meetings.id, input.id), eq(meetings.userId, ctx.auth.user.id)));
 
     if (!existingMeeting) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Meeting not found" });
@@ -52,10 +63,9 @@ export const meetingsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { search, page, pageSize } = input;
 
-      throw new TRPCError({code: "FORBIDDEN", message: "Meetings are disabled"}); 
-
       const data = await db
-        .select({ 
+        .select({
+          meetingCount: sql<number>`5`,
           ...getTableColumns(meetings),
         })
         .from(meetings)

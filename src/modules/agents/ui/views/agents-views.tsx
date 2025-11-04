@@ -25,10 +25,10 @@ export const AgentsView = () => {
   // Local loading delay simulation (non-async)
   const [delayed, setDelayed] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDelayed(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => setDelayed(false), 2000);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   if (delayed) {
     return (
@@ -51,8 +51,7 @@ export const AgentsView = () => {
           Some action
         </Button>
       </ResponsiveDialog> */}
-      <DataTable data=
-      {data.items}
+      <DataTable data={data.items.map(item => ({ ...item, meetingCount: item.meetingsCount }))}
        columns={columns} 
        onRowClick={(row)=>router.push(`/agents/${row.id}`)}
        />
