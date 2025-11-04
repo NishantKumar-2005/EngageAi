@@ -5,14 +5,19 @@ import { LoadingState } from "src/components/loading-state";
 import { useTRPC } from "src/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import ErrorState from "src/components/error-state";
+import { DataTable } from "src/components/data-table";
+import { columns } from "../components/columns";
 
 
 
 export const MeetingsView = () => {
     const trpc = useTRPC();
     const { data } = useSuspenseQuery(trpc.meetings.getMany.queryOptions({}));
+
     return(
-        <div>TODO</div>
+        <div className="overflow-x-scroll">
+          <DataTable data={data.items} columns={columns}/>
+        </div>
     );
   };
 
