@@ -4,10 +4,16 @@ import ErrorState from "src/components/error-state";
 import { LoadingState } from "src/components/loading-state";
 import { useTRPC } from "src/trpc/client";
 import { MeetingIdViewHeader } from "../components/meeting-id-view-header";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";``
 import { useConfirm } from "src/modules/agents/hooks/use-confirm";
 import { UpdateMeetingDialog } from "../components/update-meeting-dialog";
 import { useState } from "react";
+import { da } from "date-fns/locale";
+import { is } from "drizzle-orm";
+import { MeetingIdUpcomingState } from "../components/upcoming-state";
+import { ActiveState } from "../components/active-state";
+import { CancelState } from "../components/cancel-state";
+import { ProcessingState } from "../components/Processingstate";
 
 interface Props{
     meetingId:string;
@@ -49,7 +55,14 @@ export const MeetingIdView = ({meetingId}:Props) => {
             }
         }
 
-    }
+    };
+
+    const isActive = data.status === "active";
+    const isUpcoming = data.status === "upcomming";
+    const isCanceled = data.status === "cancelled";
+    const isCompleted = data.status === "completed";
+    const isProcessing = data.status === "processing";
+
     return(
        <>
        <RemoveConfirmation/>
@@ -67,7 +80,15 @@ export const MeetingIdView = ({meetingId}:Props) => {
               }}
               onRemove={handelRemoveMeeting}
             />
-            {JSON.stringify(data,null,2)}
+            {isCanceled && <div><CancelState /></div>}
+            {isActive && <div><ActiveState meetingId={meetingId} /></div>}
+            {isUpcoming && <div><MeetingIdUpcomingState
+              meetingId={meetingId}
+              onCancelMeeting={() => {}}
+              isCancelling={false}
+            /></div>}
+            {isCompleted && <div>Meeting is completed.</div>}
+            {isProcessing && <div><ProcessingState/></div>}
         </div>
        </>
     )
