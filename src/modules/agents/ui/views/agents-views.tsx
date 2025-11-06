@@ -9,13 +9,16 @@ import { useRouter } from "next/navigation";
 import { useAgentsFilters } from "../../hooks/use-agents-filters";
 import { columns } from "../components/columns";
 import { DataPagination } from "../components/data-pagination";
-import { DataTable } from "../components/data-table";
+import { DataTable } from "src/components/data-table";
+
 
 export const AgentsView = () => {
   const [filters, setFilters] = useAgentsFilters();
   const router = useRouter();
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.agents.getMany.queryOptions({ ...filters }));
+  const { data } = useSuspenseQuery(trpc.agents.getMany.queryOptions({
+     ...filters, 
+    }));
 
   // Ensure items include a `meetingCount` property expected by the DataTable columns/type.
   const items = data.items.map((item) => ({
@@ -36,7 +39,7 @@ export const AgentsView = () => {
         totalPages={data.totalPages}
         onPageChange={(page) => setFilters({ page })}
       />
-      {items.length === 0 && (
+      {data.items.length === 0 && (
         <EmptyState
           title="Create your first agent"
           description="Create an agent to join your meetings.
