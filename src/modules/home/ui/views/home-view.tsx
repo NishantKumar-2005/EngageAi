@@ -22,18 +22,37 @@
 import { Button } from "src/components/ui/button";
 import { authClient } from "src/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function HomeView() {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
+  const [isMounted, setIsMounted] = useState(false);
 
-  if (!session) {
-    return <p>Loading...</p>;
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!isMounted) {
+    return (
+      <div className="flex flex-col p-4 gap-y-4">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (isPending || !session) {
+    return (
+      <div className="flex flex-col p-4 gap-y-4">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col p-4 gap-y-4">
-      <p>Logged in as {session.user.name}</p>
+      <p>Logged in as {session.user?.name || "Unknown User"}</p>
 
       <Button
         onClick={() =>
