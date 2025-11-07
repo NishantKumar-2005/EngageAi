@@ -3,6 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import ErrorState from "src/components/error-state";
 import { useTRPC } from "src/trpc/client";
+import { CallProvider } from "../components/call-provider";
 
 interface Props{
     meetingId: string;
@@ -27,9 +28,5 @@ interface Props{
         )
      }
 
-    return(
-        <div>
-            Call View for meeting : {JSON.stringify(data,null,2)}
-        </div>
-    )
+    return <CallProvider meetingId={meetingId} meetingName={data.name}/>;
 };
