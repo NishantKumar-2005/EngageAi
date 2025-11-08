@@ -6,6 +6,7 @@ import { createAgent , openai , TextMessage} from "@inngest/agent-kit";
 
 import { inngest } from "src/inngest/client";
 import { StreamTranscriptItem } from "src/modules/meetings/types";
+import { models } from "inngest";
 
 
 const summarizer = createAgent({
@@ -97,15 +98,14 @@ const transcriptWithSpeakers = await step.run("add-speakers", async () => {
     })
   });
 
-    console.log(JSON.stringify(transcriptWithSpeakers));
 
-const { output } = await summarizer.run(
-      "Summarize the following transcript: " +
-    
-       JSON.stringify(transcriptWithSpeakers)
-    );
-    
-    console.log(JSON.stringify(transcriptWithSpeakers));
+const { output } = await step.run("generate-summary", async () => {
+  return await summarizer.run(
+    "Summarize the following transcript: " +
+    JSON.stringify(transcriptWithSpeakers, null, 2),
+    {step}
+  );
+});
     
 
   await step.run("save-summary", async () => {
