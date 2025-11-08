@@ -2,7 +2,7 @@ import { eq, inArray } from "drizzle-orm";
 import JSONL from "jsonl-parse-stringify"
 import { db } from "src/db";
 import { agents, meetings, user } from "src/db/schema";
-import { createAgent , openai , TextMessage} from "@inngest/agent-kit";
+import { createAgent , openai } from "@inngest/agent-kit";
 
 import { inngest } from "src/inngest/client";
 import { StreamTranscriptItem } from "src/modules/meetings/types";
@@ -18,9 +18,7 @@ export const meetingsProcessing = inngest.createFunction(
 { event: "meetings/processing" },
 async ({ event, step }) => {
 // Create the agent inside the function to ensure step context is available
-const summarizer = createAgent({
-  name: "summarizer",
-  system: `
+const systemPrompt = `
      You are an expert summarizer. You write readable, concise, simple content. You are given a transcript of a meeting and you need to summarize it.
 
       Use the following markdown structure for every output:
@@ -40,9 +38,18 @@ const summarizer = createAgent({
       #### Next Section
       - Feature X automatically does Y
       - Mention of integration with Z
-  `.trim(),
+  `.trim();
+
+const summarizer = createAgent({
+  name: "summarizer",
+  system: systemPrompt,
   model: openai({ model: "gpt-4o-mini", apiKey: process.env.OPENAI_API_KEY }),
 });
+
+// Ensure OpenAI is configured
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("OPENAI_API_KEY is not set; cannot run summarizer.");
+}
 
 const response = await step.run("fetch-transcript", async () => {
   return fetch(event.data.transcriptUrl).then((res) => res.text());
@@ -103,21 +110,66 @@ const transcriptWithSpeakers = await step.run("add-speakers", async () => {
   });
 
 
-const { output } = await step.run("generate-summary", async () => {
-  return await summarizer.run(
-    "Summarize the following transcript: " +
-    JSON.stringify(transcriptWithSpeakers, null, 2)
-  );
+const summaryText = await step.run("generate-summary", async () => {
+  console.log("Generating summary with transcript length:", transcriptWithSpeakers.length);
+  try {
+    const result = await summarizer.run(
+      "Summarize the following transcript: " +
+        JSON.stringify(transcriptWithSpeakers, null, 2),
+      { step }
+    );
+    const msgs = Array.isArray(result.output) ? result.output : [];
+    const text = msgs.length > 0 && msgs[0]?.type === "text"
+      ? (typeof msgs[0].content === "string" ? msgs[0].content : Array.isArray(msgs[0].content) ? msgs[0].content.map((c:any)=>c.text).join("") : "")
+      : "";
+    if (text && text.trim().length > 0) return text.trim();
+    // If unexpected structure, fall back to joining all text outputs
+    const joined = msgs
+      .filter((m:any)=>m.type === "text")
+      .map((m:any)=> typeof m.content === "string" ? m.content : Array.isArray(m.content) ? m.content.map((c:any)=>c.text).join("") : "")
+      .join("\n\n");
+    if (joined.trim().length > 0) return joined.trim();
+    throw new Error("Empty agent output");
+  } catch (err) {
+    console.warn("Agent-kit failed; falling back to direct OpenAI:", err instanceof Error ? err.message : String(err));
+    // Direct OpenAI fallback
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        temperature: 0.3,
+        max_tokens: 800,
+        messages: [
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content:
+              "Summarize the following transcript: " +
+              JSON.stringify(transcriptWithSpeakers, null, 2),
+          },
+        ],
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      throw new Error(json?.error?.message || "OpenAI chat failed");
+    }
+    const text = json?.choices?.[0]?.message?.content?.trim() || "";
+    if (!text) throw new Error("OpenAI returned empty content");
+    return text;
+  }
 });
 
   await step.run("save-summary", async () => {
+    console.log("Saving summary for meeting:", event.data.meetingId);
     await db
-    .update(meetings)
-    .set({
-      summary: (output[0] as TextMessage).content as string,
-      status: "completed",
-    })
-    .where(eq(meetings.id , event.data.meetingId))
-  })
+      .update(meetings)
+      .set({ summary: summaryText, status: "completed" })
+      .where(eq(meetings.id, event.data.meetingId));
+  });
  },
 );
