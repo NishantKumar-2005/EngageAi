@@ -9,7 +9,7 @@
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "lint": "next lint",
-    "dev:webhooks": "ngrok http --url=amani-unfretted-dominantly.ngrok-free.dev 3000",
+    "dev:webhooks": "ngrok http --url=uncorresponding-unblundering-linsey.ngrok-free.dev 3000",
     "dev:inngest":"npx inngest-cli@latest dev"
   },
   "dependencies": {

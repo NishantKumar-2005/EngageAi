@@ -8,9 +8,18 @@ import { inngest } from "src/inngest/client";
 import { StreamTranscriptItem } from "src/modules/meetings/types";
 
 
+// Note: The agent must be created within the Inngest function's execution
+// so that @inngest/agent-kit can access the step context.
+
+
+export const meetingsProcessing = inngest.createFunction(
+{ id: "meetings/processing" },
+{ event: "meetings/processing" },
+async ({ event, step }) => {
+// Create the agent inside the function to ensure step context is available
 const summarizer = createAgent({
   name: "summarizer",
-  system : `
+  system: `
      You are an expert summarizer. You write readable, concise, simple content. You are given a transcript of a meeting and you need to summarize it.
 
       Use the following markdown structure for every output:
@@ -31,14 +40,9 @@ const summarizer = createAgent({
       - Feature X automatically does Y
       - Mention of integration with Z
   `.trim(),
-  model : openai({model: "gpt-4o-mini", apiKey:process.env.OPENAI_API_KEY}),
+  model: openai({ model: "gpt-4o-mini", apiKey: process.env.OPENAI_API_KEY }),
 });
 
-
-export const meetingsProcessing = inngest.createFunction(
-{ id: "meetings/processing" },
-{ event: "meetings/processing" },
-async ({ event, step }) => {
 const response = await step.run("fetch-transcript", async () => {
   return fetch(event.data.transcriptUrl).then((res) => res.text());
 });
@@ -97,16 +101,13 @@ const transcriptWithSpeakers = await step.run("add-speakers", async () => {
     })
   });
 
-    console.log(JSON.stringify(transcriptWithSpeakers));
 
-const { output } = await summarizer.run(
-      "Summarize the following transcript: " +
-    
-       JSON.stringify(transcriptWithSpeakers)
-    );
-    
-    console.log(JSON.stringify(transcriptWithSpeakers));
-    
+const { output } = await step.run("generate-summary", async () => {
+  return await summarizer.run(
+    "Summarize the following transcript: " +
+    JSON.stringify(transcriptWithSpeakers, null, 2)
+  );
+});
 
   await step.run("save-summary", async () => {
     await db
