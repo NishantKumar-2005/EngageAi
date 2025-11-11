@@ -41,7 +41,7 @@ export const columns: ColumnDef<AgentsGetMany[number]>[]=[
         className="flex items-center gap-x-2 [&>svg]:size-4"
       >
         <VideoIcon className="text-blue-700" />
-         {row.original.meetingsCount} {row.original.meetingsCount==1 ?'meeting':'meetings'}
+        meeting {row.original.meetingCount}
       </Badge>
     ),
   },

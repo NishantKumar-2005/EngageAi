@@ -1,6 +1,5 @@
 import { 
     CallEndedEvent,
-    CallRecording,
     CallRecordingReadyEvent,
     CallSessionParticipantLeftEvent,
     CallSessionStartedEvent,
@@ -150,7 +149,7 @@ import { inngest } from "src/inngest/client";
 
             // Update the session with agent instructions
             await realtimeClient.updateSession({
-                instructions: existingAgent.instructions || "You are a helpful AI assistant in a video call. Be conversational and engaging.",
+                instructions: existingAgent.instructions + " You are a helpful AI assistant in a video call. Be conversational and engaging. Your Name is " + existingAgent.name,
             });
             
             console.log("✅ Updated session with agent instructions");

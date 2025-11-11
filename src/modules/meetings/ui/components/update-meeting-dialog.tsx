@@ -2,7 +2,6 @@
 
 import { ResponsiveDialog } from "src/components/responsive-dialogue";
 import { MeetingForm } from "./meeting-form";
-import { useRouter } from "next/navigation";
 import { MeetingGetOne } from "../../types";
 
 
@@ -26,7 +25,7 @@ return (
   >
     <MeetingForm
       initialValues={initialValue}
-      onSuccess={(id?: string) => {
+      onSuccess={() => {
         onOpenChange(false);
       }}
       onCancel={() => {

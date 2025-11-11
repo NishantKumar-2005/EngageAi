@@ -5,8 +5,6 @@ import {
     CallControls,
     SpeakerLayout,
 } from "@stream-io/video-react-sdk";
-import { Speaker } from 'lucide-react';
-
 interface Props {
 onLeave: () => void;
 meetingName: string;

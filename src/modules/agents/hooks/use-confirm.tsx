@@ -2,7 +2,6 @@ import {JSX , useState} from "react";
 
 import {Button} from "src/components/ui/button";
 import { ResponsiveDialog } from "src/components/responsive-dialogue";
-import { R } from "node_modules/better-auth/dist/shared/better-auth.BUpnjBGu";
 
 export const useConfirm = (
     title: string,

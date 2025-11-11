@@ -15,6 +15,8 @@ ClockFadingIcon,
 import { format } from "date-fns";
 import { Badge } from "src/components/ui/badge";
 import { formatDuration } from "src/lib/utils";
+import { Transcript } from "./Transcript";
+import Chat from "./chat";
 
 interface Props {
 data: MeetingGetOne;
@@ -59,6 +61,9 @@ return (
             <ScrollBar orientation="horizontal" />
         </ScrollArea>
         </div>
+        <TabsContent value="transcript">
+            <Transcript meetingId={data.id} />
+        </TabsContent>
         <TabsContent value="recording">
             <div className="bg-white rounded-lg border px-4 py-5">
                 <video
@@ -67,6 +72,10 @@ return (
                 controls
                 />
             </div>
+        </TabsContent>
+
+        <TabsContent value="chat">
+            <Chat meetingId={data.id} agentName={data.agent.name} />
         </TabsContent>
 
          <TabsContent value="summary">

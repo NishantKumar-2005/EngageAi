@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusIcon, Scroll, XCircleIcon } from "lucide-react";
+import { PlusIcon,XCircleIcon } from "lucide-react";
 import { Button } from "src/components/ui/button";
 import { NewAgentDialog } from "./new-agent-dialog";
 import { useState } from "react";

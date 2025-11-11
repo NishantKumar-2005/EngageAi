@@ -6,11 +6,32 @@ import { createAgent , openai } from "@inngest/agent-kit";
 
 import { inngest } from "src/inngest/client";
 import { StreamTranscriptItem } from "src/modules/meetings/types";
-import { models } from "inngest";
 
 
 // Note: The agent must be created within the Inngest function's execution
 // so that @inngest/agent-kit can access the step context.
+
+// Minimal types to safely parse agent-kit output without using `any`.
+type AgentTextChunk = { text: string };
+type AgentMessage = {
+  type: string; // e.g., "text", but we don't restrict to allow forward-compat
+  content: string | AgentTextChunk[];
+};
+type AgentRunResult = {
+  output?: unknown;
+};
+
+function isStreamTranscriptItem(value: unknown): value is StreamTranscriptItem {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v["speaker_id"] === "string" &&
+    typeof v["type"] === "string" &&
+    typeof v["text"] === "string" &&
+    typeof v["start_ts"] === "number" &&
+    typeof v["stop_ts"] === "number"
+  );
+}
 
 
 export const meetingsProcessing = inngest.createFunction(
@@ -56,7 +77,14 @@ const response = await step.run("fetch-transcript", async () => {
 });
 
 const transcript = await step.run("parse-transcript", async () => {
-return JSONL.parse<StreamTranscriptItem>(response) ;
+  const parsed = JSONL.parse(response);
+  if (!Array.isArray(parsed)) {
+    throw new Error("Transcript JSONL did not parse to an array");
+  }
+  if (!parsed.every(isStreamTranscriptItem)) {
+    throw new Error("Transcript items are not in expected shape");
+  }
+  return parsed as StreamTranscriptItem[];
 });
 
 const transcriptWithSpeakers = await step.run("add-speakers", async () => {
@@ -87,9 +115,9 @@ const transcriptWithSpeakers = await step.run("add-speakers", async () => {
     const speakers = [...userSpeakers, ...agentSpeakers];
 
      return transcript.map((item) => {
-        const speaker = speakers.find(
-        (speaker) => speaker. id === item.speaker_id
-        );
+  const speaker = speakers.find(
+  (speaker) => speaker.id === item.speaker_id
+  );
 
         if (!speaker) {
         return {
@@ -113,20 +141,32 @@ const transcriptWithSpeakers = await step.run("add-speakers", async () => {
 const summaryText = await step.run("generate-summary", async () => {
   console.log("Generating summary with transcript length:", transcriptWithSpeakers.length);
   try {
-    const result = await summarizer.run(
+    const rawResult = (await summarizer.run(
       "Summarize the following transcript: " +
         JSON.stringify(transcriptWithSpeakers, null, 2),
       { step }
-    );
-    const msgs = Array.isArray(result.output) ? result.output : [];
-    const text = msgs.length > 0 && msgs[0]?.type === "text"
-      ? (typeof msgs[0].content === "string" ? msgs[0].content : Array.isArray(msgs[0].content) ? msgs[0].content.map((c:any)=>c.text).join("") : "")
-      : "";
+    )) as AgentRunResult;
+    const output = rawResult.output;
+    const msgs: AgentMessage[] = Array.isArray(output) ? (output as AgentMessage[]) : [];
+    const text =
+      msgs.length > 0 && msgs[0]?.type === "text"
+        ? typeof msgs[0].content === "string"
+          ? msgs[0].content
+          : Array.isArray(msgs[0].content)
+            ? msgs[0].content.map((c: AgentTextChunk) => c.text).join("")
+            : ""
+        : "";
     if (text && text.trim().length > 0) return text.trim();
     // If unexpected structure, fall back to joining all text outputs
     const joined = msgs
-      .filter((m:any)=>m.type === "text")
-      .map((m:any)=> typeof m.content === "string" ? m.content : Array.isArray(m.content) ? m.content.map((c:any)=>c.text).join("") : "")
+      .filter((m: AgentMessage) => m.type === "text")
+      .map((m: AgentMessage) =>
+        typeof m.content === "string"
+          ? m.content
+          : Array.isArray(m.content)
+            ? m.content.map((c: AgentTextChunk) => c.text).join("")
+            : "",
+      )
       .join("\n\n");
     if (joined.trim().length > 0) return joined.trim();
     throw new Error("Empty agent output");

@@ -18,7 +18,7 @@ import{
     DrawerTrigger,
     } from "src/components/ui/drawer";
 
-import { Avatar , AvatarImage, AvatarFallback } from "src/components/ui/avatar";
+import { Avatar , AvatarImage} from "src/components/ui/avatar";
 import { GeneratedAvatar } from "src/components/generated-avatar";
 import { ChevronDownIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";

@@ -6,7 +6,6 @@ import { MeetingGetMany } from "../../types"
 import { GeneratedAvatar } from "src/components/generated-avatar";
 import { 
   CornerDownRightIcon,
-   VideoIcon,
    CircleCheckIcon,
    CircleXIcon,
    ClockArrowUpIcon,

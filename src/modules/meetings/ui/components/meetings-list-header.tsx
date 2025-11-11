@@ -8,8 +8,6 @@ import { MeetingsSearchFilters } from "./meetings-search-filter";
 import { StatusFilter } from "./status-filter";
 import { AgentIdFilter } from "./agent-id-filter";
 import { useMeetingsFilters } from "../../hooks/use-meetings-filters";
-import { set } from "better-auth";
-import { is } from "drizzle-orm";
 import { ScrollArea, ScrollBar } from "src/components/ui/scroll-area";
 
 export const MeetingsListHeader = () => {

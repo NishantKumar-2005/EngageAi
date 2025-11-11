@@ -4,7 +4,7 @@ import ErrorState from "src/components/error-state";
 import { LoadingState } from "src/components/loading-state";
 import { useTRPC } from "src/trpc/client";
 import { MeetingIdViewHeader } from "../components/meeting-id-view-header";
-import { useRouter } from "next/navigation";``
+import { useRouter } from "next/navigation";
 import { useConfirm } from "src/modules/agents/hooks/use-confirm";
 import { UpdateMeetingDialog } from "../components/update-meeting-dialog";
 import { useState } from "react";
@@ -83,7 +83,7 @@ export const MeetingIdView = ({meetingId}:Props) => {
             {isActive && <div><ActiveState meetingId={meetingId} /></div>}
             {isUpcoming && <div><MeetingIdUpcomingState
               meetingId={meetingId}
-              onCancelMeeting={() => {}}
+              
               isCancelling={false}
             /></div>}
             {isCompleted && <CompletedState data={data} />}

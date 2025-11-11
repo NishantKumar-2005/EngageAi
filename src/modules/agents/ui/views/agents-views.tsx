@@ -10,6 +10,7 @@ import { useAgentsFilters } from "../../hooks/use-agents-filters";
 import { columns } from "../components/columns";
 import { DataPagination } from "../components/data-pagination";
 import { DataTable } from "src/components/data-table";
+import { AgentsGetMany } from "../../types";
 
 
 export const AgentsView = () => {
@@ -20,20 +21,12 @@ export const AgentsView = () => {
      ...filters, 
     }));
 
-  // Ensure items include a `meetingCount` property expected by the DataTable columns/type.
-  const items = data.items.map((item) => ({
-    ...item,
-    // prefer existing `meetingCount` if present, otherwise map from `meetingsCount`
-    meetingCount: (item as any).meetingCount ?? (item as any).meetingsCount ?? 0,
-  }));
+  // Items are already correctly typed from the router output.
+  const items: AgentsGetMany = data.items;
 
   return (
     <div className="flex-1 pb-4 px-4 md:px-8 flex flex-col gap-y-4">
-      <DataTable
-        data={items}
-        columns={columns}
-        onRowClick={(row) => router.push(`/agents/${row.id}`)}
-      />
+      <DataTable data={items} columns={columns} onRowClick={(row) => router.push(`/agents/${row.id}`)} />
       <DataPagination
         page={filters.page}
         totalPages={data.totalPages}

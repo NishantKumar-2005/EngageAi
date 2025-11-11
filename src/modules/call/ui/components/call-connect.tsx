@@ -14,9 +14,6 @@ import {
 import {useTRPC} from "src/trpc/client";
 import { useMutation } from '@tanstack/react-query';
 import "@stream-io/video-react-sdk/dist/css/styles.css";
-import { _ } from 'node_modules/better-auth/dist/shared/better-auth.BUpnjBGu';
-import { set } from 'better-auth';
-import { user } from 'src/db/schema';
 import { CallUI } from './call-ui';
 
 
