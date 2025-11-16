@@ -86,7 +86,7 @@ const{data , isPending} = authClient.useSession();
                     </DrawerHeader>
                     <DrawerFooter>
                         <Button variant="outline"
-                        onClick={()=>{}}>
+                        onClick={()=> authClient.customer.portal()}>
                             <CreditCardIcon className="size-4 text-black"/>
                             Billing
                         </Button>
@@ -138,6 +138,7 @@ const{data , isPending} = authClient.useSession();
                 <DropdownMenuSeparator/>
 
                 <DropdownMenuItem
+                onClick={()=> authClient.customer.portal()}
                 className ="cursor-pointer flex items-center justify-between">
                     Billing
                     <CreditCardIcon className="size-4"/>

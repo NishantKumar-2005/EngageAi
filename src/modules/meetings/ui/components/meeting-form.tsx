@@ -25,6 +25,7 @@ import{
 } from "src/components/ui/form";
 import { useState } from "react";
 import { NewAgentDialog } from "src/modules/agents/ui/components/new-agent-dialog";
+import { useRouter } from "next/navigation";
 
 
 interface MeetingFormProps {
@@ -40,6 +41,7 @@ onCancel,
 initialValues,
 }: MeetingFormProps) => {
 const trpc = useTRPC();
+const router = useRouter();
 const queryClient = useQueryClient();
 const [openNewAgentDialog , setNewOpenAgentDialog] = useState(false);
 const [agentSearch,setAgentSearch] = useState("")
@@ -57,12 +59,17 @@ const createMeeting = useMutation(
            await queryClient.invalidateQueries(
                 trpc.meetings.getMany.queryOptions({}),
             );
+             await queryClient.invalidateQueries(
+                trpc.premium.getFreeUsage.queryOptions(),
+            );
             onSuccess?.(data?.id);
         },
         onError: (error) => {
             toast.error(error.message);
-
-            //TODO : CHECK FOR VALIDATION ERRORS
+        
+            if(error.data?.code === "FORBIDDEN"){
+             router.push("/upgrade");
+           }
         }
     }),
 );
@@ -80,8 +87,7 @@ const updateMeeting = useMutation(
       },
       onError: (error) => {
         toast.error(`Error updating agent: ${error.message}`);
-        // TODO: Check if error code is 'CONFLICT' and show a specific message
-        // TODO: Check if error code is FORBIDDEN, redirect to "/upgrade"
+      
       },
     })
   );

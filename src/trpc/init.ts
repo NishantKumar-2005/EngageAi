@@ -1,7 +1,12 @@
 import { initTRPC, TRPCError} from '@trpc/server';
+import { count, eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { cache } from 'react';
+import { db } from 'src/db';
+import { agents, meetings } from 'src/db/schema';
 import { auth } from 'src/lib/auth'; 
+import { polarClient } from 'src/lib/polar';
+import { MAX_FREE_AGENTS, MAX_FREE_MEETINGS } from 'src/modules/premium/constants';
 export const createTRPCContext = cache(async () => {
   /**
    * @see: https://trpc.io/docs/server/context
@@ -36,3 +41,52 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
 
 
 });
+
+export const premiumProcedure = (entity: "meetings" | "agents") => 
+  protectedProcedure.use(async({ctx, next}) => {
+    const customer = await polarClient.customers.getStateExternal({
+      externalId: ctx.auth.user.id,
+    });
+     
+   
+           const [userMeetings] = await db
+             .select ({
+             count: count(meetings.id),
+             })
+             .from(meetings)
+             .where(eq(meetings.userId, ctx.auth.user.id) );
+ 
+          const [userAgents] = await db
+             .select ({
+             count: count(agents.id),
+             })
+             .from(agents)
+             .where(eq(agents.userId, ctx.auth.user.id) );
+
+          const isPremium = customer.activeSubscriptions.length > 0;
+          const isFreeAgentLimitReached = userAgents.count >= MAX_FREE_AGENTS;
+          const isFreeMeetingLimitReached = userMeetings.count >= MAX_FREE_MEETINGS;
+
+          const shouldThrowMeetingError =
+            entity === "meetings" && isFreeMeetingLimitReached && !isPremium;
+            const shouldThrowAgentError =
+            entity === "agents" && isFreeAgentLimitReached && !isPremium;
+
+            if (shouldThrowMeetingError) {
+            throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You have reached the maximum number of free meetings",
+            });
+          }
+
+            if (shouldThrowAgentError) {
+            throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You have reached the maximum number of free agents",
+            });
+
+          }
+          return next({ctx: {...ctx, customer} });    
+  });
+
+  
