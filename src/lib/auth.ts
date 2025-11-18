@@ -15,7 +15,7 @@ export const auth = betterAuth({
       use:[
         checkout({
           authenticatedUsersOnly:true,
-          successUrl:"/upgrade"
+          successUrl:"https://www.engageaihelp.tech/upgrade"
         }),
         portal(),
       ]
