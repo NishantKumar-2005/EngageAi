@@ -137,8 +137,8 @@ export const SignUpView = () => {
                setPending(false);
                router.push("/")
             },
-            onError : ({error}) => {
-               setError(error.message);
+            onError : ({ error }: { error?: Error | null }) => {
+               setError(error?.message || "An unknown error occurred");
                setPending(false);
             },
          }
@@ -157,8 +157,8 @@ export const SignUpView = () => {
           onSuccess : () => {
              setPending(false);
           },
-          onError : ({error}) => {
-             setError(error.message);
+          onError : ({ error }: { error?: Error | null }) => {
+             setError(error?.message || "An unknown error occurred");
              setPending(false);
           },
        }

@@ -11,21 +11,21 @@ import { polarClient } from "src/lib/polar";
 export const premiumRouter = createTRPCRouter({
 
     getCurrentSubscription: protectedProcedure.query(async({ctx}) => {
-           const customer = await polarClient.customers.getStateExternal({
-               externalId: ctx.auth.user.id,
-           });
+        const customer = await polarClient.customers.getStateExternal({
+            externalId: ctx.auth.user.id,
+        });
 
-    const subscription = customer.activeSubscriptions[0];
+        const subscription = customer.activeSubscriptions[0];
 
-    if(!subscription){
-        return null;
-    }
+        if(!subscription){
+            return null;
+        }
 
-    const product = await polarClient.products.get({
-        id:subscription.productId,
-    });
+        const product = await polarClient.products.get({
+            id:subscription.productId,
+        });
 
-    return product;
+        return product;
     }),
 
     getProducts: protectedProcedure.query(async () => {

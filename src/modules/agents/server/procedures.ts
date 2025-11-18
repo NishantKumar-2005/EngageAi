@@ -107,17 +107,22 @@ export const agentsRouter = createTRPCRouter({
         };
     }),
 
-    create:premiumProcedure("agents")
-        .input(agentsInsertSchema)
-        .mutation(async ({ input, ctx }) => {
-        const [createdAgent] = await db
-        .insert(agents)
-        .values({
-        ... input,
-        userId: ctx.auth.user.id,
-        })
-        .returning();
-    return createdAgent;
+create: premiumProcedure("agents")
+    .input(agentsInsertSchema)
+    .mutation(async ({ input, ctx }) => {
+        try {
+            const [createdAgent] = await db
+                .insert(agents)
+                .values({
+                    ...input,
+                    userId: ctx.auth.user.id,
+                })
+                .returning();
+            return createdAgent;
+        } catch (err) {
+            console.error("Error in agents.create:", err);
+            throw err;
+        }
     }),
 
 });
